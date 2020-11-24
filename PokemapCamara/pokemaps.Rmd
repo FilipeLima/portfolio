@@ -1,0 +1,33 @@
+---
+#title: "Maps"
+#author: "Filipe Lima"
+#date: "24/11/2020"
+output: html_document
+---
+## Mapa com os ginásios de Pokémon de Camaragibe
+Feito por [Filipe Lima](https://github.com/FilipeLima).
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(googlesheets4)
+library(dplyr)
+library(leaflet)
+```
+
+```{r, echo=FALSE, ,message=FALSE}
+map_sheet <- read.csv("coords.csv")
+```
+
+```{r, echo=FALSE, ,message=FALSE}
+map_sheet <- map_sheet[!is.na(map_sheet$Ginásio),]
+lat <- unlist(lapply(strsplit(map_sheet$coordenadas,","),`[[`,1))
+lng <- unlist(lapply(strsplit(map_sheet$coordenadas,","),`[[`,2))
+map_sheet <- select(map_sheet,-coordenadas)
+map_sheet$lat <- as.numeric(lat)
+map_sheet$lng <- as.numeric(lng)
+```
+
+```{r, echo=FALSE}
+popupGYM <- paste(map_sheet$Ginásio, "<br> Coordenadas: ", as.character(map_sheet$lat),as.character(map_sheet$lng),"<br> Endereço: ",map_sheet$Logradouro, "<br> Bairro: ",map_sheet$Bairro)
+map_sheet[,c(4,5)] %>% leaflet() %>% addTiles() %>% 
+        addMarkers(popup=popupGYM)
+```
+
